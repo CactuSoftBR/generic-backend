@@ -1,14 +1,11 @@
-/*
-  Warnings:
+-- CreateTable
+CREATE TABLE "customers" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "perfil" INTEGER NOT NULL,
 
-  - You are about to drop the `Metrics` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropForeignKey
-ALTER TABLE "Metrics" DROP CONSTRAINT "Metrics_customerId_fkey";
-
--- DropTable
-DROP TABLE "Metrics";
+    CONSTRAINT "customers_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "metrics" (
@@ -17,11 +14,14 @@ CREATE TABLE "metrics" (
     "latency" INTEGER,
     "packetLoss" INTEGER,
     "ping" BOOLEAN,
-    "traffic" INTEGER,
+    "traffic" DOUBLE PRECISION,
     "customerId" TEXT NOT NULL,
 
     CONSTRAINT "metrics_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "customers_name_key" ON "customers"("name");
 
 -- AddForeignKey
 ALTER TABLE "metrics" ADD CONSTRAINT "metrics_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "customers"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

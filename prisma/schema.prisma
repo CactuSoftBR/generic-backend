@@ -30,7 +30,7 @@ model Metrics {
   latency    Int?
   packetLoss Int?
   ping       Boolean?
-  traffic    Int?
+  traffic    Float?
   customer   Customers @relation(fields: [customerId], references: [id])
   customerId String
 

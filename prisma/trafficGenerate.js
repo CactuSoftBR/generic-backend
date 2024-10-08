@@ -106,7 +106,7 @@ module.exports = {
       }
 
       bgpData.push({
-        traffic: ping ? c * (10 ^ 8) * diferança : null,
+        traffic: ping ? parseFloat((c * diferança).toFixed(2)) : null,
         ping: ping,
         packetLoss: ping ? packageLoss : null,
         latency: ping ? latency : null,
