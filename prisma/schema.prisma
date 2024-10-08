@@ -15,27 +15,24 @@ datasource db {
 
 //statusCliente	ipConcentrador	nomeConcentrador	conexaoCliente	latitudeCliente	longitudeCliente	conexaoInicial	conexaoFinal	tempoConectado	consumoDownload	consumoUpload	motivoDesconexao	popCliente	nomeCliente	enderecoCliente	bairroCliente	cidadeCliente	contratoStatus	planoContrato	statusInternet	downloadCliente	uploadCliente	valorPlano	timestamp		
 
-model Clientes {
-  id               String    @id @default(uuid())
-  statusCliente    Boolean?
-  ipConcentrador   String?
-  nomeConcentrador String?
-  latitudeCliente  String?
-  longitudeCliente String?
-  conexaoInicial   DateTime?
-  conexaoFinal     DateTime?
-  tempoConectado   Int?
-  consumoDownload  BigInt?
-  consumoUpload    BigInt?
-  motivoDesconexao String?
-  popCliente       String?
-  nomeCliente      String?
-  enderecoCliente  String?
-  bairroCliente    String?
-  cidadeCliente    String?
-  planoContrato    String?
-  statusInternet   Int?
-  valorPlano       Float?
+model Customers {
+  id      String    @id @default(uuid())
+  name    String    @unique
+  perfil  Int
+  Metrics Metrics[]
 
-  @@map("clientes")
+  @@map("customers")
+}
+
+model Metrics {
+  id         String    @id @default(uuid())
+  date       DateTime
+  latency    Int?
+  packetLoss Int?
+  ping       Boolean?
+  traffic    Int?
+  customer   Customers @relation(fields: [customerId], references: [id])
+  customerId String
+
+  @@map("metrics")
 }

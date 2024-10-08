@@ -1,43 +1,69 @@
-const csv = require("csvtojson");
-const fs = require("fs");
-const path = require("path");
-const { faker } = require("@faker-js/faker");
-
+const { emularConsumoTrafegoSemanaSuave } = require("./trafficGenerate");
 const { PrismaClient } = require("@prisma/client");
-
 const prisma = new PrismaClient();
 
-function convertStringToDate(dateString) {
-  if (!dateString) return null;
-  return new Date(dateString);
+async function main(params) {
+  // Cria uma lista de clientes com perfis de consumo diferentes
+  const customers = [
+    {
+      name: "FiberWave",
+      perfil: 1,
+    },
+    {
+      name: "NetFusion",
+      perfil: 3,
+    },
+    {
+      name: "HyperConnect",
+      perfil: 2,
+    },
+    {
+      name: "LinkSphere",
+      perfil: 3,
+    },
+    {
+      name: "OptiNet",
+      perfil: 2,
+    },
+  ];
+
+  /*   id         String    @id @default(uuid())
+  date       DateTime
+  latency    Int
+  packetLoss Int
+  ping       Boolean
+  traffic    Int
+  customer   Customers @relation(fields: [customerId], references: [id])
+  customerId String */
+
+  const customersResponse = await Promise.all(
+    customers.map((customer) =>
+      prisma.customers.upsert({
+        where: { name: customer.name },
+        update: {
+          name: customer.name,
+          perfil: customer.perfil,
+        },
+        create: {
+          name: customer.name,
+          perfil: customer.perfil,
+        },
+      })
+    )
+  );
+
+  const metrics = customersResponse.map((customer, index) => {
+    const bgpData = emularConsumoTrafegoSemanaSuave(customer.id, index);
+    return bgpData;
+  });
+  //createMany Metrics
+  const metricsResponse = await Promise.all(
+    metrics.map((metric) =>
+      prisma.metrics.createMany({
+        data: metric,
+      })
+    )
+  );
 }
 
-async function main() {
-  const csvFilePath = path.join(__dirname, "../src/data/clientes.csv");
-  const jsonArray = await csv().fromFile(csvFilePath);
-  jsonArray.map((cliente, index) => {
-    jsonArray[index].conexaoInicial = convertStringToDate(
-      cliente.conexaoInicial
-    );
-    jsonArray[index].conexaoFinal = convertStringToDate(cliente.conexaoFinal);
-    jsonArray[index].statusCliente = Boolean(cliente.statusCliente);
-    jsonArray[index].nomeCliente = faker.person.fullName().toUpperCase();
-    jsonArray[index].tempoConectado = parseInt(cliente.tempoConectado);
-    jsonArray[index].consumoDownload = parseInt(cliente.consumoDownload);
-    jsonArray[index].consumoUpload = parseInt(cliente.consumoUpload);
-    jsonArray[index].statusInternet = parseInt(cliente.statusInternet);
-    jsonArray[index].valorPlano = parseFloat(cliente.valorPlano);
-  });
-  await prisma.clientes.createMany({ data: jsonArray });
-}
-
-main()
-  .then(async () => {
-    console.log("Seed concluído com sucesso");
-    await prisma.$disconnect();
-  })
-  .catch(async (e) => {
-    console.error(e);
-    await prisma.$disconnect();
-    process.exit(1);
-  });
+main();
