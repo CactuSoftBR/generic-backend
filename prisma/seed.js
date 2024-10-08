@@ -27,15 +27,6 @@ async function main(params) {
     },
   ];
 
-  /*   id         String    @id @default(uuid())
-  date       DateTime
-  latency    Int
-  packetLoss Int
-  ping       Boolean
-  traffic    Int
-  customer   Customers @relation(fields: [customerId], references: [id])
-  customerId String */
-
   const customersResponse = await Promise.all(
     customers.map((customer) =>
       prisma.customers.upsert({

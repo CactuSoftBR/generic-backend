@@ -78,13 +78,12 @@ module.exports = {
       let latency;
       if (
         Math.random() <
-        0.01 <
         (index === 0 ? 0.3 : index == 5 ? 0.1 : index == 2 ? 0.02 : 0.01)
       ) {
-        // 1% de chance de latência entre 30 e 200 ms
+        // 1% de chance de latência entre 50 e 220 ms
         latency = 50 + Math.random() * 170;
       } else {
-        // 99% de chance de latência entre 0 e 30 ms
+        // 99% de chance de latência entre 0 e 50 ms
         latency = Math.random() * 49;
       }
 
